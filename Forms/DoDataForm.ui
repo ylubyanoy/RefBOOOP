@@ -166,39 +166,45 @@
     </rect>
    </property>
    <property name="title">
-    <string/>
+    <string>Численность</string>
    </property>
    <widget class="QLabel" name="labelProfs">
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>10</y>
+      <y>20</y>
       <width>241</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>Численность членов профсоюза</string>
+     <string>Членов профсоюза</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="labelWorkers">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>20</y>
       <width>181</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>Численность работников</string>
+     <string>Работников</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QSpinBox" name="sbWorkers">
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>10</y>
+      <y>20</y>
       <width>131</width>
       <height>27</height>
      </rect>
@@ -454,7 +460,7 @@
    <property name="geometry">
     <rect>
      <x>600</x>
-     <y>150</y>
+     <y>160</y>
      <width>131</width>
      <height>27</height>
     </rect>
