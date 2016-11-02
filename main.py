@@ -17,7 +17,6 @@ def connect_to_db():
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    # app.setStyle('Fusion')
     db = connect_to_db()
     w = LoginPage.MyLoginPage(db=db)
     w.show()

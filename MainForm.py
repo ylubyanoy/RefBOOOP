@@ -15,6 +15,8 @@ class MyMainWindow(QtWidgets.QDialog):
                             " областного объединения организаций профсоюзов")
         self.username = None
         self.password = None
+        # Словарь с данными для редактирования и сохранения в БД
+        self.dict_data = {}
 
         if self.db.isOpen():
             self.stm = QtSql.QSqlRelationalTableModel()
@@ -61,28 +63,18 @@ class MyMainWindow(QtWidgets.QDialog):
     def on_add_record(self):
         fm_add_data = df.DoDataForm(self, do_type=1)
         fm_add_data.exec()
-        # if fm_add_user.username is not None and fm_add_user.password is not None:
-        #     new_index = self.stm.rowCount()
-        #     self.stm.insertRow(new_index)
-        #     self.stm.setData(self.stm.index(new_index, 1), fm_add_user.username)
-        #     self.stm.setData(self.stm.index(new_index, 2), fm_add_user.password)
-        #     self.stm.setData(self.stm.index(new_index, 3), 1 if fm_add_user.is_admin else 0)
-        #
-        #     self.stm.setData(self.stm.index(new_index, 5), 1 if fm_add_user.is_booop else 0)
-        #     self.stm.submit()
-        #     self.stm.select()
+        self.stm.select()
 
     def on_delete_record(self):
-        pass
-        # button = QtWidgets.QMessageBox.question(None, "Удаление пользователя", "Удалить пользователя '{}'?"
-        #                                         .format(self.stm.index(self.tvUsers.currentIndex().row(), 1).data().strip()))
-        # if button == QtWidgets.QMessageBox.Yes:
-        #     self.delete_user(self.stm.index(self.tvUsers.currentIndex().row(), 0).data())
+        button = QtWidgets.QMessageBox.question(None, "Удаление данных", "Удалить запись '{}'?"
+                                                .format(self.stm.index(self.tvMain.currentIndex().row(), 1).data()))
+        if button == QtWidgets.QMessageBox.Yes:
+            self.delete_pred(self.stm.index(self.tvMain.currentIndex().row(), 0).data())
 
-    def delete_record(self, user_id):
+    def delete_pred(self, pred_id):
         query = QtSql.QSqlQuery()
-        query.prepare("DELETE FROM usersdb WHERE id_user=:sel_user")
-        query.bindValue(':sel_user', user_id)
+        query.prepare("DELETE FROM preds WHERE id_pred=:pred_id")
+        query.bindValue(':pred_id', pred_id)
         if not query.exec_():
             QtWidgets.QMessageBox.warning(None, "Ошибка", query.lastError().text())
         else:
@@ -93,28 +85,21 @@ class MyMainWindow(QtWidgets.QDialog):
         self.close()
 
     def on_edit_record(self):
-        fm_add_data = df.DoDataForm(self, do_type=2, otrasl_name=self.stm.index(self.tvMain.currentIndex().row(), 11).data(),
-                                    rayon_name=self.stm.index(self.tvMain.currentIndex().row(), 12).data())
+        self.dict_data = {'EditPredName': self.stm.index(self.tvMain.currentIndex().row(), 1).data(),
+                          'sbWorkers': self.stm.index(self.tvMain.currentIndex().row(), 8).data(),
+                          'sbProfs': self.stm.index(self.tvMain.currentIndex().row(), 9).data(),
+                          'EditWPosition': self.stm.index(self.tvMain.currentIndex().row(), 2).data(),
+                          'EditWFIO': self.stm.index(self.tvMain.currentIndex().row(), 3).data(),
+                          'EditWTel': self.stm.index(self.tvMain.currentIndex().row(), 4).data(),
+                          'EditPPosition': self.stm.index(self.tvMain.currentIndex().row(), 5).data(),
+                          'EditPFIO': self.stm.index(self.tvMain.currentIndex().row(), 6).data(),
+                          'EditPTel': self.stm.index(self.tvMain.currentIndex().row(), 7).data(),
+                          'EditAdress': self.stm.index(self.tvMain.currentIndex().row(), 10).data(),
+                          'otrasl_name': self.stm.index(self.tvMain.currentIndex().row(), 11).data(),
+                          'rayon_name': self.stm.index(self.tvMain.currentIndex().row(), 12).data(),
+                          'id_pred': self.stm.index(self.tvMain.currentIndex().row(), 0).data()
+                          }
 
-        fm_add_data.EditPredName.setText((self.stm.index(self.tvMain.currentIndex().row(), 1).data().strip()))
-        fm_add_data.sbWorkers.setValue((self.stm.index(self.tvMain.currentIndex().row(), 8).data()))
-        fm_add_data.sbProfs.setValue((self.stm.index(self.tvMain.currentIndex().row(), 9).data()))
-        fm_add_data.EditWPosition.setText((self.stm.index(self.tvMain.currentIndex().row(), 2).data()))
-        fm_add_data.EditWFIO.setText((self.stm.index(self.tvMain.currentIndex().row(), 3).data()))
-        fm_add_data.EditWTel.setText((self.stm.index(self.tvMain.currentIndex().row(), 4).data()))
-        fm_add_data.EditPPosition.setText((self.stm.index(self.tvMain.currentIndex().row(), 5).data()))
-        fm_add_data.EditPFIO.setText((self.stm.index(self.tvMain.currentIndex().row(), 6).data()))
-        fm_add_data.EditPTel.setText((self.stm.index(self.tvMain.currentIndex().row(), 7).data()))
-        fm_add_data.EditAdress.setText((self.stm.index(self.tvMain.currentIndex().row(), 10).data()))
-
-        fm_add_data.exec()
-        # if fm_edit_user.username is not None and fm_edit_user.password is not None:
-        #     edit_index = self.tvUsers.currentIndex().row()
-        #     rec = self.stm.record(edit_index)
-        #     rec.setValue(1, fm_edit_user.username)
-        #     rec.setValue(2, fm_edit_user.password)
-        #     rec.setValue(3, True if fm_edit_user.is_admin else False)
-        #
-        #     rec.setValue(5, True if fm_edit_user.is_booop else False)
-        #     self.stm.setRecord(edit_index, rec)
-        #     self.stm.submit()
+        fm_edit_data = df.DoDataForm(self, do_type=2, dict_data=self.dict_data)
+        fm_edit_data.exec()
+        self.stm.selectRow(self.tvMain.currentIndex().row())
