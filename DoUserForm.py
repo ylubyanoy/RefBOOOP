@@ -12,17 +12,18 @@ class UserForm(QtWidgets.QDialog):
         # Подключение обработчиков для кнопок
         self.btnSave.clicked.connect(self.on_clicked_save)
         self.btnCancel.clicked.connect(self.on_clicked_cancel)
+        # Переменные для новых значений
         self.username = None
         self.password = None
         self.is_admin = False
         self.otrasl_id = 0
         self.otrasl_name = otrasl_name
         self.is_booop = False
+        # Инициализация формы
         self.otrasli_init(do_type)
 
     def otrasli_init(self, do_type):
         self.cboOtrasl.clear()
-        # self.cboOtrasl.addItem("<Пустое значение>", 0)
         query = QtSql.QSqlQuery()
         query.exec("SELECT id_otrasl, otname FROM otrasli")
         if query.isActive():
@@ -30,6 +31,8 @@ class UserForm(QtWidgets.QDialog):
             while query.isValid():
                 self.cboOtrasl.addItem(query.value('otname'), int(query.value('id_otrasl')))
                 query.next()
+        if do_type == 1:
+            self.cboOtrasl.addItem("<Пустое значение>", 0)
         self.cboOtrasl.setCurrentIndex(self.cboOtrasl.findText(self.otrasl_name))
 
     def set_username(self, username):

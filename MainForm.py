@@ -93,15 +93,21 @@ class MyMainWindow(QtWidgets.QDialog):
         self.close()
 
     def on_edit_record(self):
-        fm_add_data = df.DoDataForm(self, do_type=2)
+        fm_add_data = df.DoDataForm(self, do_type=2, otrasl_name=self.stm.index(self.tvMain.currentIndex().row(), 11).data(),
+                                    rayon_name=self.stm.index(self.tvMain.currentIndex().row(), 12).data())
+
+        fm_add_data.EditPredName.setText((self.stm.index(self.tvMain.currentIndex().row(), 1).data().strip()))
+        fm_add_data.sbWorkers.setValue((self.stm.index(self.tvMain.currentIndex().row(), 8).data()))
+        fm_add_data.sbProfs.setValue((self.stm.index(self.tvMain.currentIndex().row(), 9).data()))
+        fm_add_data.EditWPosition.setText((self.stm.index(self.tvMain.currentIndex().row(), 2).data()))
+        fm_add_data.EditWFIO.setText((self.stm.index(self.tvMain.currentIndex().row(), 3).data()))
+        fm_add_data.EditWTel.setText((self.stm.index(self.tvMain.currentIndex().row(), 4).data()))
+        fm_add_data.EditPPosition.setText((self.stm.index(self.tvMain.currentIndex().row(), 5).data()))
+        fm_add_data.EditPFIO.setText((self.stm.index(self.tvMain.currentIndex().row(), 6).data()))
+        fm_add_data.EditPTel.setText((self.stm.index(self.tvMain.currentIndex().row(), 7).data()))
+        fm_add_data.EditAdress.setText((self.stm.index(self.tvMain.currentIndex().row(), 10).data()))
+
         fm_add_data.exec()
-        # fm_edit_user = uf.UserForm(self, do_type=2)
-        # fm_edit_user.set_username(self.stm.index(self.tvUsers.currentIndex().row(), 1).data().strip())
-        # fm_edit_user.set_pass(self.stm.index(self.tvUsers.currentIndex().row(), 2).data().strip())
-        # fm_edit_user.set_admin_flag(self.stm.index(self.tvUsers.currentIndex().row(), 3).data())
-        #
-        # fm_edit_user.set_booop_flag(self.stm.index(self.tvUsers.currentIndex().row(), 5).data())
-        # fm_edit_user.exec()
         # if fm_edit_user.username is not None and fm_edit_user.password is not None:
         #     edit_index = self.tvUsers.currentIndex().row()
         #     rec = self.stm.record(edit_index)
@@ -112,4 +118,3 @@ class MyMainWindow(QtWidgets.QDialog):
         #     rec.setValue(5, True if fm_edit_user.is_booop else False)
         #     self.stm.setRecord(edit_index, rec)
         #     self.stm.submit()
-
