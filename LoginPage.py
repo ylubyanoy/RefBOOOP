@@ -13,7 +13,7 @@ class MyLoginPage(QtWidgets.QMainWindow):
         self.setWindowTitle("Авторизация")
         self.setFixedSize(584, 156)
         # Инициализация статусной строки
-        # self.status_init()
+        self.status_init()
 
         # self.pushButton.setStyleSheet(S_PUSH_BUTTON_OK)
         # self.btnCancel.setStyleSheet(S_PUSH_BUTTON_CANCEL)

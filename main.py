@@ -1,7 +1,7 @@
-from settings import db_conn
 import sys
 from PyQt5 import QtWidgets, QtSql
 import LoginPage
+from settings import db_conn
 
 
 def connect_to_db():
@@ -19,6 +19,6 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     # app.setStyle('Fusion')
     db = connect_to_db()
-    w = LoginPage.MyLoginPage(db)
+    w = LoginPage.MyLoginPage(db=db)
     w.show()
     sys.exit(app.exec_())
