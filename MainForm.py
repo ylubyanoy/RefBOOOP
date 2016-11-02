@@ -12,7 +12,7 @@ class MyMainWindow(QtWidgets.QDialog):
         self.btnDelRecord.clicked.connect(self.on_delete_record)
         self.btnEditRecord.clicked.connect(self.on_edit_record)
         self.setWindowTitle("Справочник первичных профсоюзных организаций Белгородского"
-                            " областного объединения организаций профсоюзов ")
+                            " областного объединения организаций профсоюзов")
         self.username = None
         self.password = None
 
