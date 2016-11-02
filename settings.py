@@ -1,9 +1,9 @@
 # Database parameters
-DB_USER = "postgres"
-DB_PASS = "12345"
-DB_NAME = "BookOOPS"
-DB_HOST = "localhost"
-DB_PORT = 5432
+db_conn = {'db_user': "postgres",
+           'db_pass': "12345",
+           'db_name': "BookOOPS",
+           'db_host': "localhost",
+           'db_port': 5432}
 
 # Styles for interfaces
 S_PUSH_BUTTON_OK = """
