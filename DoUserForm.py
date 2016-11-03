@@ -84,7 +84,7 @@ class UserForm(QtWidgets.QDialog):
             self.close()
 
     def update_usersdb(self, dict_data_upd):
-        """Редактирование и запись данных в таблицу Preds"""
+        """Редактирование и запись данных в таблицу usersdb"""
         # Проверка заполнения данных
         if not self.dict_data_form['leUserName'] or not self.dict_data_form['lePassword']:
             QtWidgets.QMessageBox.warning(None, "Редактирование", "Ошибка при записи! Не все обязательные поля заполнены")
@@ -110,7 +110,7 @@ class UserForm(QtWidgets.QDialog):
             return True
 
     def insert_usersdb(self, dict_data_ins):
-        """Запись новых данных в таблицу Preds"""
+        """Запись новых данных в таблицу usersdb"""
         # Проверка заполнения данных
         if not self.dict_data_form['leUserName'] or not self.dict_data_form['lePassword']:
             QtWidgets.QMessageBox.warning(None, "Новая запись", "Ошибка при записи! Не все обязательные поля заполнены")
@@ -133,7 +133,7 @@ class UserForm(QtWidgets.QDialog):
             return query.lastInsertId()
 
     def select_usersdb(self, id_user):
-        """Получение данных из таблицы Preds"""
+        """Получение данных из таблицы usersdb"""
 
         dict_data = {}
 
