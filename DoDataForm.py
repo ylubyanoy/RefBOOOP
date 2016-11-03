@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtWidgets, uic, QtSql
 EMPTY_DATA = "<Пустое значение>"
 
 class DoDataForm(QtWidgets.QDialog):
-    def __init__(self, parent=None, do_type=1, dict_data=None, pred_id=0):
+    def __init__(self, parent=None, do_type=1, pred_id=0):
         QtWidgets.QWidget.__init__(self, parent)
         uic.loadUi("Forms/DoDataForm.ui", self)
         # Настройка окна Добавления/редактирования данных
@@ -14,10 +14,7 @@ class DoDataForm(QtWidgets.QDialog):
         # Инициализация формы
         self.do_type = do_type
         self.pred_id = pred_id
-        if dict_data is None:
-            self.dict_data_form = {}
-        else:
-            self.dict_data_form = dict_data
+        self.dict_data_form = {}
 
         self.data_init(self.do_type)
 
