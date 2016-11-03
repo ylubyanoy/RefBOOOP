@@ -45,24 +45,6 @@ class UserForm(QtWidgets.QDialog):
             self.cboOtrasl.addItem(EMPTY_TEXT, EMPTY_DATA)
         self.cboOtrasl.setCurrentIndex(self.cboOtrasl.findData(self.dict_data_form.get('id_otrasl', EMPTY_DATA)))
 
-    # def set_username(self, username):
-    #     self.leUserName.setText(username)
-    #
-    # def set_pass(self, password):
-    #     self.lePassword.setText(password)
-    #
-    # def set_admin_flag(self, state_flag):
-    #     if state_flag:
-    #         self.cbIsAdmin.setCheckState(QtCore.Qt.Checked)
-    #     else:
-    #         self.cbIsAdmin.setCheckState(QtCore.Qt.Unchecked)
-    #
-    # def set_booop_flag(self, state_flag):
-    #     if state_flag:
-    #         self.cbIsBOOOP.setCheckState(QtCore.Qt.Checked)
-    #     else:
-    #         self.cbIsBOOOP.setCheckState(QtCore.Qt.Unchecked)
-
     def on_clicked_cancel(self):
         self.close()
 

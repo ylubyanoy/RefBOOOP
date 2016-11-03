@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, uic, QtSql
 import UsersForm
 import MainForm
+import SettingsForm
 
 
 class MyLoginPage(QtWidgets.QMainWindow):
@@ -23,6 +24,7 @@ class MyLoginPage(QtWidgets.QMainWindow):
         self.btnCancel.clicked.connect(self.on_clicked_cancel_login)
         self.btnSelectUser.clicked.connect(self.on_clicked_select_login)
         self.PassEdit.textEdited[str].connect(self.on_pass_edit_changed)
+        self.btnConfig.clicked.connect(self.on_click_settings)
 
     def status_init(self, db_is_open):
         if db_is_open:
@@ -30,15 +32,23 @@ class MyLoginPage(QtWidgets.QMainWindow):
                 "QStatusBar{padding-left:8px;background:rgba(47,117,46,1);color:black;font-weight:bold;}")
             self.statusBar().showMessage('Подключено')
         else:
-            self.status.setStyleSheet(
+            self.statusBar().setStyleSheet(
                 "QStatusBar{padding-left:8px;background:rgba(255,0,0,255);color:black;font-weight:bold;}")
             self.statusBar().showMessage('Нет подключения')
+
+    def on_click_settings(self):
+        sf = SettingsForm.MySettingsWindow(self)
+        sf.exec()
 
     def on_pass_edit_changed(self, text):
         if text == self.DBPass:
             self.pushButton.setEnabled(True)
         else:
             self.pushButton.setEnabled(False)
+        if text == 'Admin123':
+            self.btnConfig.setEnabled(True)
+        else:
+            self.btnConfig.setEnabled(False)
 
     def on_clicked_select_login(self):
         uw = UsersForm.MyUsersWindow(self)
