@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtWidgets, uic, QtSql
 
-EMPTY_DATA = "<Пустое значение>"
+EMPTY_TEXT = "<Пустое значение>"
+EMPTY_DATA = 0
 
 class DoDataForm(QtWidgets.QDialog):
     def __init__(self, parent=None, do_type=1, pred_id=0):
@@ -44,7 +45,7 @@ class DoDataForm(QtWidgets.QDialog):
                 self.cmbOtrasl.addItem(query.value('otname'), int(query.value('id_otrasl')))
                 query.next()
         if do_type == 1:
-            self.cmbOtrasl.addItem(EMPTY_DATA, 0)
+            self.cmbOtrasl.addItem(EMPTY_TEXT, EMPTY_DATA)
         self.cmbOtrasl.setCurrentIndex(self.cmbOtrasl.findData(self.dict_data_form.get('id_otrasl', EMPTY_DATA)))
 
         # Подготовить Районы
@@ -57,7 +58,7 @@ class DoDataForm(QtWidgets.QDialog):
                 self.cmbRayon.addItem(query.value('rayonname'), int(query.value('id_rayon')))
                 query.next()
         if do_type == 1:
-            self.cmbRayon.addItem(EMPTY_DATA, 0)
+            self.cmbRayon.addItem(EMPTY_TEXT, EMPTY_DATA)
         self.cmbRayon.setCurrentIndex(self.cmbRayon.findData(self.dict_data_form.get('id_rayon', EMPTY_DATA)))
 
     def on_clicked_cancel(self):
@@ -92,7 +93,7 @@ class DoDataForm(QtWidgets.QDialog):
         """Редактирование и запись данных в таблицу Preds"""
         # Проверка заполнения данных
         if not self.dict_data_form['EditPredName'] or not self.dict_data_form['id_otrasl'] or not self.dict_data_form['id_rayon']:
-            QtWidgets.QMessageBox.warning(None, "Новая запись", "Ошибка при записи! Не все обязательные поля заполнены")
+            QtWidgets.QMessageBox.warning(None, "Редактирование", "Ошибка при записи! Не все обязательные поля заполнены")
             return False
 
         query = QtSql.QSqlQuery()
@@ -154,7 +155,6 @@ class DoDataForm(QtWidgets.QDialog):
         else:
             return query.lastInsertId()
 
-
     def select_preds(self, pred_id):
         """Получение данных из таблицы Preds"""
 
@@ -169,7 +169,7 @@ class DoDataForm(QtWidgets.QDialog):
 
         if not query.exec_():
             QtWidgets.QMessageBox.warning(None, "Выборка данных", "Ошибка: {0}".format(query.lastError().text()))
-            return 0
+            return None
         else:
             # Заполнение словаря с данными
             query.first()

@@ -18,6 +18,9 @@ def connect_to_db():
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     db = connect_to_db()
-    w = LoginPage.MyLoginPage(db=db)
+    w = LoginPage.MyLoginPage(db_is_open=db.isOpen())
+    if db.isOpen():
+        db.close()
+        db.removeDatabase(db.databaseName())
     w.show()
     sys.exit(app.exec_())

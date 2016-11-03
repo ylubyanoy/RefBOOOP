@@ -4,8 +4,7 @@ import MainForm
 
 
 class MyLoginPage(QtWidgets.QMainWindow):
-    def __init__(self, parent=None, db=None):
-        self.db = db
+    def __init__(self, parent=None, db_is_open=False):
         self.DBPass = None
         QtWidgets.QWidget.__init__(self, parent)
         uic.loadUi("Forms/LoginMainForm.ui", self)
@@ -13,10 +12,11 @@ class MyLoginPage(QtWidgets.QMainWindow):
         self.setWindowTitle("Авторизация")
         self.setFixedSize(584, 156)
         # Инициализация статусной строки
-        self.status_init()
+        self.status_init(db_is_open)
 
         # self.pushButton.setStyleSheet(S_PUSH_BUTTON_OK)
         # self.btnCancel.setStyleSheet(S_PUSH_BUTTON_CANCEL)
+
         self.pushButton.setEnabled(False)
         # Подключение обработчиков для кнопок
         self.pushButton.clicked.connect(self.on_clicked_ok_login)
@@ -24,8 +24,8 @@ class MyLoginPage(QtWidgets.QMainWindow):
         self.btnSelectUser.clicked.connect(self.on_clicked_select_login)
         self.PassEdit.textEdited[str].connect(self.on_pass_edit_changed)
 
-    def status_init(self):
-        if self.db.open():
+    def status_init(self, db_is_open):
+        if db_is_open:
             self.statusBar().setStyleSheet(
                 "QStatusBar{padding-left:8px;background:rgba(47,117,46,1);color:black;font-weight:bold;}")
             self.statusBar().showMessage('Подключено')
@@ -41,7 +41,7 @@ class MyLoginPage(QtWidgets.QMainWindow):
             self.pushButton.setEnabled(False)
 
     def on_clicked_select_login(self):
-        uw = UsersForm.MyUsersWindow(self, db=self.db)
+        uw = UsersForm.MyUsersWindow(self)
         uw.exec()
         if uw.username is not None:
             self.UserEdit.setText(uw.username.strip())
@@ -49,13 +49,10 @@ class MyLoginPage(QtWidgets.QMainWindow):
             self.PassEdit.setFocus()
 
     def on_clicked_cancel_login(self):
-        if self.db.isOpen():
-            self.db.close()
-            self.db.removeDatabase(self.db.databaseName())
-        QtWidgets.qApp.quit()
+        self.close()
 
     def on_clicked_ok_login(self):
-        mf = MainForm.MyMainWindow(self, db=self.db)
+        mf = MainForm.MyMainWindow(self)
         mf.exec()
 
 
