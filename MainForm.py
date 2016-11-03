@@ -16,7 +16,7 @@ class MyMainWindow(QtWidgets.QDialog):
         self.username = None
         self.password = None
         # Словарь с данными для редактирования и сохранения в БД
-        self.dict_data = {}
+        # self.dict_data = {}
 
         if self.db.isOpen():
             self.stm = QtSql.QSqlRelationalTableModel()
@@ -85,21 +85,6 @@ class MyMainWindow(QtWidgets.QDialog):
         self.close()
 
     def on_edit_record(self):
-        self.dict_data = {'EditPredName': self.stm.index(self.tvMain.currentIndex().row(), 1).data(),
-                          'sbWorkers': self.stm.index(self.tvMain.currentIndex().row(), 8).data(),
-                          'sbProfs': self.stm.index(self.tvMain.currentIndex().row(), 9).data(),
-                          'EditWPosition': self.stm.index(self.tvMain.currentIndex().row(), 2).data(),
-                          'EditWFIO': self.stm.index(self.tvMain.currentIndex().row(), 3).data(),
-                          'EditWTel': self.stm.index(self.tvMain.currentIndex().row(), 4).data(),
-                          'EditPPosition': self.stm.index(self.tvMain.currentIndex().row(), 5).data(),
-                          'EditPFIO': self.stm.index(self.tvMain.currentIndex().row(), 6).data(),
-                          'EditPTel': self.stm.index(self.tvMain.currentIndex().row(), 7).data(),
-                          'EditAdress': self.stm.index(self.tvMain.currentIndex().row(), 10).data(),
-                          'otrasl_name': self.stm.index(self.tvMain.currentIndex().row(), 11).data(),
-                          'rayon_name': self.stm.index(self.tvMain.currentIndex().row(), 12).data(),
-                          'id_pred': self.stm.index(self.tvMain.currentIndex().row(), 0).data()
-                          }
-
-        fm_edit_data = df.DoDataForm(self, do_type=2, dict_data=self.dict_data)
+        fm_edit_data = df.DoDataForm(self, do_type=2, pred_id=self.stm.index(self.tvMain.currentIndex().row(), 0).data())
         fm_edit_data.exec()
         self.stm.selectRow(self.tvMain.currentIndex().row())

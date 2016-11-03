@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtWidgets, uic, QtSql
 EMPTY_DATA = "<Пустое значение>"
 
 class DoDataForm(QtWidgets.QDialog):
-    def __init__(self, parent=None, do_type=1, dict_data=None):
+    def __init__(self, parent=None, do_type=1, dict_data=None, pred_id=0):
         QtWidgets.QWidget.__init__(self, parent)
         uic.loadUi("Forms/DoDataForm.ui", self)
         # Настройка окна Добавления/редактирования данных
@@ -13,6 +13,7 @@ class DoDataForm(QtWidgets.QDialog):
         self.btnCancel.clicked.connect(self.on_clicked_cancel)
         # Инициализация формы
         self.do_type = do_type
+        self.pred_id = pred_id
         if dict_data is None:
             self.dict_data_form = {}
         else:
@@ -22,7 +23,9 @@ class DoDataForm(QtWidgets.QDialog):
 
     def data_init(self, do_type):
         # Подготовить данные
-        if do_type == 2 and self.dict_data_form:
+        if do_type == 2:
+            self.dict_data_form = self.select_preds(self.pred_id)
+
             self.EditPredName.setText(self.dict_data_form['EditPredName'])
             self.sbWorkers.setValue(self.dict_data_form['sbWorkers'])
             self.sbProfs.setValue(self.dict_data_form['sbProfs'])
@@ -45,7 +48,7 @@ class DoDataForm(QtWidgets.QDialog):
                 query.next()
         if do_type == 1:
             self.cmbOtrasl.addItem(EMPTY_DATA, 0)
-        self.cmbOtrasl.setCurrentIndex(self.cmbOtrasl.findText(self.dict_data_form.get('otrasl_name', EMPTY_DATA)))
+        self.cmbOtrasl.setCurrentIndex(self.cmbOtrasl.findData(self.dict_data_form.get('id_otrasl', EMPTY_DATA)))
 
         # Подготовить Районы
         self.cmbRayon.clear()
@@ -58,7 +61,7 @@ class DoDataForm(QtWidgets.QDialog):
                 query.next()
         if do_type == 1:
             self.cmbRayon.addItem(EMPTY_DATA, 0)
-        self.cmbRayon.setCurrentIndex(self.cmbRayon.findText(self.dict_data_form.get('rayon_name', EMPTY_DATA)))
+        self.cmbRayon.setCurrentIndex(self.cmbRayon.findData(self.dict_data_form.get('id_rayon', EMPTY_DATA)))
 
     def on_clicked_cancel(self):
         self.close()
@@ -78,13 +81,23 @@ class DoDataForm(QtWidgets.QDialog):
         self.dict_data_form['id_otrasl'] = self.cmbOtrasl.itemData(self.cmbOtrasl.currentIndex())
         self.dict_data_form['id_rayon'] = self.cmbRayon.itemData(self.cmbRayon.currentIndex())
 
+        # Запись новых данных
         if self.do_type == 1:
             self.dict_data_form['id_pred'] = self.insert_preds(self.dict_data_form)
-            self.close()
+            if self.dict_data_form['id_pred']:
+                self.close()
+
+        # Запись отредактированных данных
         elif self.do_type == 2 and self.update_preds(self.dict_data_form):
             self.close()
 
     def update_preds(self, dict_data_upd):
+        """Редактирование и запись данных в таблицу Preds"""
+        # Проверка заполнения данных
+        if not self.dict_data_form['EditPredName'] or not self.dict_data_form['id_otrasl'] or not self.dict_data_form['id_rayon']:
+            QtWidgets.QMessageBox.warning(None, "Новая запись", "Ошибка при записи! Не все обязательные поля заполнены")
+            return False
+
         query = QtSql.QSqlQuery()
         query.prepare("UPDATE preds SET prname=:prname, rukdolgnost=:rukdolgnost, rukfio=:rukfio, ruktel=:ruktel, "
                       "profdolgnost=:profdolgnost, proffio=:proffio, proftel=:proftel, rabcount=:rabcount, "
@@ -107,11 +120,18 @@ class DoDataForm(QtWidgets.QDialog):
         query.bindValue(':id_pred', dict_data_upd['id_pred'])
 
         if not query.exec_():
-            QtWidgets.QMessageBox.warning(None, "Ошибка", "Ошибка при записи: {0}".format(query.lastError().text()))
+            QtWidgets.QMessageBox.warning(None, "Редактирование", "Ошибка при записи: {0}".format(query.lastError().text()))
+            return False
         else:
             return True
 
     def insert_preds(self, dict_data_ins):
+        """Запись новых данных в таблицу Preds"""
+        # Проверка заполнения данных
+        if not self.dict_data_form['EditPredName'] or not self.dict_data_form['id_otrasl'] or not self.dict_data_form['id_rayon']:
+            QtWidgets.QMessageBox.warning(None, "Новая запись", "Ошибка при записи! Не все обязательные поля заполнены")
+            return 0
+
         query = QtSql.QSqlQuery()
         query.prepare("INSERT INTO preds (prname, rukdolgnost, rukfio, ruktel, profdolgnost, proffio, proftel, rabcount, "
                       "profcount, adress, otraslid, rayonid) "
@@ -132,6 +152,44 @@ class DoDataForm(QtWidgets.QDialog):
         query.bindValue(':rayonid', dict_data_ins['id_rayon'])
 
         if not query.exec_():
-            QtWidgets.QMessageBox.warning(None, "Ошибка", "Ошибка при записи: {0}".format(query.lastError().text()))
+            QtWidgets.QMessageBox.warning(None, "Новая запись", "Ошибка при записи: {0}".format(query.lastError().text()))
+            return 0
         else:
             return query.lastInsertId()
+
+
+    def select_preds(self, pred_id):
+        """Получение данных из таблицы Preds"""
+
+        dict_data = {}
+
+        query = QtSql.QSqlQuery()
+        query.prepare("SELECT id_pred, prname, rukdolgnost, rukfio, ruktel, profdolgnost, proffio, proftel, rabcount, "
+                      "profcount, adress, otraslid, rayonid FROM preds "
+                      "WHERE id_pred=:id_pred")
+
+        query.bindValue(':id_pred', pred_id)
+
+        if not query.exec_():
+            QtWidgets.QMessageBox.warning(None, "Выборка данных", "Ошибка: {0}".format(query.lastError().text()))
+            return 0
+        else:
+            # Заполнение словаря с данными
+            query.first()
+
+            dict_data['EditPredName'] = query.value('prname')
+            dict_data['EditWPosition'] = query.value('rukdolgnost')
+            dict_data['EditWFIO'] = query.value('rukfio')
+            dict_data['EditWTel'] = query.value('ruktel')
+            dict_data['EditPPosition'] = query.value('profdolgnost')
+            dict_data['EditPFIO'] = query.value('proffio')
+            dict_data['EditPTel'] = query.value('proftel')
+            dict_data['sbWorkers'] = query.value('rabcount')
+            dict_data['sbProfs'] = query.value('profcount')
+            dict_data['EditAdress'] = query.value('adress')
+            dict_data['id_otrasl'] = query.value('otraslid')
+            dict_data['id_rayon'] = query.value('rayonid')
+
+            dict_data['id_pred'] = query.value('id_pred')
+
+            return dict_data
