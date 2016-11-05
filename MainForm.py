@@ -110,6 +110,7 @@ class MyMainWindow(QtWidgets.QDialog):
 
     def on_clicked_cancel(self):
         self.close()
+        self.destroy()
 
     def on_edit_record(self):
         fm_edit_data = DoDataForm.DoDataForm(self, do_type=2,

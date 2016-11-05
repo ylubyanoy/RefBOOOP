@@ -62,6 +62,7 @@ class MyUsersWindow(QtWidgets.QDialog):
 
     def on_clicked_cancel_user(self):
         self.close()
+        self.destroy()
 
     def on_edit_user(self):
         fm_edit_user = DoUserForm.UserForm(self, do_type=2,
