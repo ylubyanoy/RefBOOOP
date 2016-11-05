@@ -4,7 +4,7 @@ import DoUserForm as uf
 
 class MyUsersWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QtWidgets.QWidget.__init__(self, parent)
+        super(QtWidgets.QDialog, self).__init__(parent)
         uic.loadUi("Forms/UsersForm.ui", self)
         self.btnCancel.clicked.connect(self.on_clicked_cancel_user)
         self.btnSelectUser.clicked.connect(self.on_clicked_select_user)
@@ -53,7 +53,6 @@ class MyUsersWindow(QtWidgets.QDialog):
         if not query.exec_():
             QtWidgets.QMessageBox.warning(None, "Ошибка", query.lastError().text())
         else:
-            self.stm.submit()
             self.stm.select()
 
     def on_clicked_select_user(self):

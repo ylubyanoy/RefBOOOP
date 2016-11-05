@@ -4,7 +4,7 @@ import DoDataForm as df
 
 class MyMainWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QtWidgets.QWidget.__init__(self, parent)
+        super(QtWidgets.QDialog, self).__init__(parent)
         uic.loadUi("Forms/MainForm.ui", self)
 
         self.btnCloseMainForm.clicked.connect(self.on_clicked_cancel)
@@ -53,6 +53,7 @@ class MyMainWindow(QtWidgets.QDialog):
         self.tvMain.hideColumn(15)
         self.tvMain.hideColumn(16)
 
+        self.tvMain.setAlternatingRowColors(True)
         self.tvMain.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
     def on_add_record(self):
@@ -73,7 +74,6 @@ class MyMainWindow(QtWidgets.QDialog):
         if not query.exec_():
             QtWidgets.QMessageBox.warning(None, "Ошибка", query.lastError().text())
         else:
-            self.stm.submit()
             self.stm.select()
 
     def on_clicked_cancel(self):
