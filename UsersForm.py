@@ -12,8 +12,7 @@ class MyUsersWindow(QtWidgets.QDialog):
         self.btnDelRecord.clicked.connect(self.on_delete_user)
         self.btnEditRecord.clicked.connect(self.on_edit_user)
         self.setWindowTitle("Выберите пользователя")
-        self.username = None
-        self.password = None
+        self.dict_user = {}
 
         self.stm = QtSql.QSqlRelationalTableModel()
         self.stm.setJoinMode(QtSql.QSqlRelationalTableModel.LeftJoin)
@@ -56,8 +55,12 @@ class MyUsersWindow(QtWidgets.QDialog):
             self.stm.select()
 
     def on_clicked_select_user(self):
-        self.username = self.stm.index(self.tvUsers.currentIndex().row(), 1).data()
-        self.password = self.stm.index(self.tvUsers.currentIndex().row(), 2).data()
+        self.dict_user['id_user'] = self.stm.index(self.tvUsers.currentIndex().row(), 0).data()
+        self.dict_user['username'] = self.stm.index(self.tvUsers.currentIndex().row(), 1).data()
+        self.dict_user['password'] = self.stm.index(self.tvUsers.currentIndex().row(), 2).data()
+        self.dict_user['ADMIN'] = self.stm.index(self.tvUsers.currentIndex().row(), 3).data()
+        self.dict_user['otname'] = self.stm.index(self.tvUsers.currentIndex().row(), 4).data()
+        self.dict_user['BOOOP'] = self.stm.index(self.tvUsers.currentIndex().row(), 5).data()
         self.close()
 
     def on_clicked_cancel_user(self):

@@ -43,6 +43,7 @@ class MyMainWindow(QtWidgets.QDialog):
         self.btnEditRecord.clicked.connect(self.on_edit_record)
         self.setWindowTitle("Справочник первичных профсоюзных организаций Белгородского"
                             " областного объединения организаций профсоюзов")
+        self.dict_user = {}
 
         self.stm = NewQSqlRelationalTableModel()  # QtSql.QSqlRelationalTableModel()
         self.stm.setTable("preds")
@@ -90,6 +91,7 @@ class MyMainWindow(QtWidgets.QDialog):
 
     def on_add_record(self):
         fm_add_data = DoDataForm.DoDataForm(self, do_type=1)
+        fm_add_data.dict_user = self.dict_user
         fm_add_data.exec()
         self.stm.select()
 
@@ -115,5 +117,6 @@ class MyMainWindow(QtWidgets.QDialog):
     def on_edit_record(self):
         fm_edit_data = DoDataForm.DoDataForm(self, do_type=2,
                                              pred_id=self.stm.index(self.tvMain.currentIndex().row(), 0).data())
+        fm_edit_data.dict_user = self.dict_user
         fm_edit_data.exec()
         self.stm.selectRow(self.tvMain.currentIndex().row())

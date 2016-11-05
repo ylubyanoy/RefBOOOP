@@ -17,6 +17,7 @@ class DoDataForm(QtWidgets.QDialog):
         self.do_type = do_type
         self.pred_id = pred_id
         self.dict_data_form = {}
+        self.dict_user = {}
 
         self.data_init(self.do_type)
 
@@ -77,6 +78,7 @@ class DoDataForm(QtWidgets.QDialog):
         self.dict_data_form['EditPTel'] = self.EditPTel.text()
         self.dict_data_form['EditAdress'] = self.EditAdress.text()
 
+        self.dict_data_form['id_user'] = self.dict_user['id_user']
         self.dict_data_form['id_otrasl'] = self.cmbOtrasl.itemData(self.cmbOtrasl.currentIndex())
         self.dict_data_form['id_rayon'] = self.cmbRayon.itemData(self.cmbRayon.currentIndex())
 
@@ -100,7 +102,7 @@ class DoDataForm(QtWidgets.QDialog):
         query = QtSql.QSqlQuery()
         query.prepare("UPDATE preds SET prname=:prname, rukdolgnost=:rukdolgnost, rukfio=:rukfio, ruktel=:ruktel, "
                       "profdolgnost=:profdolgnost, proffio=:proffio, proftel=:proftel, rabcount=:rabcount, "
-                      "profcount=:profcount, adress=:adress, otraslid=:otraslid, rayonid=:rayonid "
+                      "profcount=:profcount, adress=:adress, otraslid=:otraslid, rayonid=:rayonid "  # , userid=:id_user
                       "WHERE id_pred=:id_pred")
 
         query.bindValue(':prname', dict_data_upd['EditPredName'])
@@ -116,6 +118,7 @@ class DoDataForm(QtWidgets.QDialog):
         query.bindValue(':otraslid', dict_data_upd['id_otrasl'])
         query.bindValue(':rayonid', dict_data_upd['id_rayon'])
 
+        # query.bindValue(':id_user', dict_data_upd['id_user'])
         query.bindValue(':id_pred', dict_data_upd['id_pred'])
 
         if not query.exec_():
@@ -133,9 +136,9 @@ class DoDataForm(QtWidgets.QDialog):
 
         query = QtSql.QSqlQuery()
         query.prepare("INSERT INTO preds (prname, rukdolgnost, rukfio, ruktel, profdolgnost, proffio, proftel, rabcount, "
-                      "profcount, adress, otraslid, rayonid) "
+                      "profcount, adress, otraslid, rayonid, userid) "
                       "VALUES (:prname, :rukdolgnost, :rukfio, :ruktel, :profdolgnost, :proffio, :proftel, :rabcount, "
-                      ":profcount, :adress, :otraslid, :rayonid)")
+                      ":profcount, :adress, :otraslid, :rayonid, :id_user)")
 
         query.bindValue(':prname', dict_data_ins['EditPredName'])
         query.bindValue(':rukdolgnost', dict_data_ins['EditWPosition'])
@@ -149,6 +152,8 @@ class DoDataForm(QtWidgets.QDialog):
         query.bindValue(':adress', dict_data_ins['EditAdress'])
         query.bindValue(':otraslid', dict_data_ins['id_otrasl'])
         query.bindValue(':rayonid', dict_data_ins['id_rayon'])
+
+        query.bindValue(':id_user', dict_data_ins['id_user'])
 
         if not query.exec_():
             QtWidgets.QMessageBox.warning(None, "Новая запись", "Ошибка при записи: {0}".format(query.lastError().text()))

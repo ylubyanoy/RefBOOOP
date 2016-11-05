@@ -16,7 +16,7 @@ class MyLoginPage(QtWidgets.QMainWindow):
 
         # self.pushButton.setStyleSheet(S_PUSH_BUTTON_OK)
         # self.btnCancel.setStyleSheet(S_PUSH_BUTTON_CANCEL)
-        self.DBPass = None
+        self.dict_user = {}
         self.pushButton.setEnabled(False)
         # Подключение обработчиков для кнопок
         self.pushButton.clicked.connect(self.on_clicked_ok_login)
@@ -40,7 +40,7 @@ class MyLoginPage(QtWidgets.QMainWindow):
         sf.exec()
 
     def on_pass_edit_changed(self, text):
-        if text == self.DBPass:
+        if text == self.dict_user['password']:
             self.pushButton.setEnabled(True)
         else:
             self.pushButton.setEnabled(False)
@@ -52,9 +52,9 @@ class MyLoginPage(QtWidgets.QMainWindow):
     def on_clicked_select_login(self):
         uw = UsersForm.MyUsersWindow(self)
         uw.exec()
-        if uw.username is not None:
-            self.UserEdit.setText(uw.username.strip())
-            self.DBPass = uw.password.strip()
+        self.dict_user = uw.dict_user
+        if self.dict_user['username']:
+            self.UserEdit.setText(self.dict_user['username'])
             self.PassEdit.setFocus()
 
     def on_clicked_cancel_login(self):
@@ -62,6 +62,7 @@ class MyLoginPage(QtWidgets.QMainWindow):
 
     def on_clicked_ok_login(self):
         mf = MainForm.MyMainWindow(self)
+        mf.dict_user = self.dict_user
         mf.exec()
 
 
