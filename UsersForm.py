@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtWidgets, uic, QtSql
-import DoUserForm as uf
+import DoUserForm
 
 
 class MyUsersWindow(QtWidgets.QDialog):
@@ -36,7 +36,7 @@ class MyUsersWindow(QtWidgets.QDialog):
         self.tvUsers.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
     def on_add_user(self):
-        fm_add_user = uf.UserForm(self, do_type=1)
+        fm_add_user = DoUserForm.UserForm(self, do_type=1)
         fm_add_user.exec()
         self.stm.select()
 
@@ -64,8 +64,8 @@ class MyUsersWindow(QtWidgets.QDialog):
         self.close()
 
     def on_edit_user(self):
-        otrasl_name = self.stm.index(self.tvUsers.currentIndex().row(), 4).data()
-        fm_edit_user = uf.UserForm(self, do_type=2, id_user=self.stm.index(self.tvUsers.currentIndex().row(), 0).data())
+        fm_edit_user = DoUserForm.UserForm(self, do_type=2,
+                                           id_user=self.stm.index(self.tvUsers.currentIndex().row(), 0).data())
         fm_edit_user.exec()
         self.stm.selectRow(self.tvUsers.currentIndex().row())
 

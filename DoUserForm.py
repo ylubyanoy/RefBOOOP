@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtWidgets, uic, QtSql
 EMPTY_TEXT = "<Пустое значение>"
 EMPTY_DATA = 0
 
+
 class UserForm(QtWidgets.QDialog):
     def __init__(self, parent=None, do_type=1, id_user=0):
         super(QtWidgets.QDialog, self).__init__(parent)

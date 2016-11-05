@@ -1,10 +1,40 @@
-from PyQt5 import QtCore, QtWidgets, uic, QtSql
-import DoDataForm as df
+from PyQt5 import QtCore, QtWidgets, uic, QtSql, QtGui
+import DoDataForm
+
+
+class NewQSqlRelationalTableModel(QtSql.QSqlRelationalTableModel):
+
+    def data(self, index, role):
+        value = QtSql.QSqlRelationalTableModel.data(self, index, role)
+
+        if role == QtCore.Qt.FontRole:
+            column15_data = index.sibling(index.row(), 15).data()  # deleteddata
+            column16_data = index.sibling(index.row(), 16).data()  # markeddata
+            if column15_data == 1:
+                font = QtGui.QFont('Arial', 10)
+                font.setStrikeOut(True)
+                return font
+            if column16_data == 1:
+                font = QtGui.QFont('Arial', 8)
+                font.setBold(True)
+                return font
+
+        if role == QtCore.Qt.TextColorRole:
+            column15_data = index.sibling(index.row(), 15).data()  # deleteddata
+            column16_data = index.sibling(index.row(), 16).data()  # markeddata
+            if column15_data == 1:
+                return QtGui.QColor(QtCore.Qt.darkRed)
+            if column16_data == 1:
+                return QtGui.QColor(QtCore.Qt.darkGreen)
+
+        return value
 
 
 class MyMainWindow(QtWidgets.QDialog):
+
     def __init__(self, parent=None):
         super(QtWidgets.QDialog, self).__init__(parent)
+
         uic.loadUi("Forms/MainForm.ui", self)
 
         self.btnCloseMainForm.clicked.connect(self.on_clicked_cancel)
@@ -14,11 +44,12 @@ class MyMainWindow(QtWidgets.QDialog):
         self.setWindowTitle("Справочник первичных профсоюзных организаций Белгородского"
                             " областного объединения организаций профсоюзов")
 
-        self.stm = QtSql.QSqlRelationalTableModel()
+        self.stm = NewQSqlRelationalTableModel()  # QtSql.QSqlRelationalTableModel()
         self.stm.setTable("preds")
+        self.stm.setEditStrategy(QtSql.QSqlTableModel.OnManualSubmit)
         self.stm.setRelation(11, QtSql.QSqlRelation('otrasli', 'id_otrasl', 'otname'))
         self.stm.setRelation(12, QtSql.QSqlRelation('rayons', 'id_rayon', 'rayonname'))
-        self.stm.select()
+
         self.stm.setHeaderData(0, QtCore.Qt.Horizontal, "id")
         self.stm.setHeaderData(1, QtCore.Qt.Horizontal, "Наименование организации")
         self.stm.setHeaderData(2, QtCore.Qt.Horizontal, "Должность\nруководителя")
@@ -31,6 +62,7 @@ class MyMainWindow(QtWidgets.QDialog):
         self.stm.setHeaderData(9, QtCore.Qt.Horizontal, "Численность\nчленов\nпрофсоюза")
         self.stm.setHeaderData(11, QtCore.Qt.Horizontal, "Отрасль")
         self.stm.setHeaderData(12, QtCore.Qt.Horizontal, "Район")
+        self.stm.select()
 
         self.tvMain.setModel(self.stm)
 
@@ -57,7 +89,7 @@ class MyMainWindow(QtWidgets.QDialog):
         self.tvMain.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
     def on_add_record(self):
-        fm_add_data = df.DoDataForm(self, do_type=1)
+        fm_add_data = DoDataForm.DoDataForm(self, do_type=1)
         fm_add_data.exec()
         self.stm.select()
 
@@ -80,6 +112,7 @@ class MyMainWindow(QtWidgets.QDialog):
         self.close()
 
     def on_edit_record(self):
-        fm_edit_data = df.DoDataForm(self, do_type=2, pred_id=self.stm.index(self.tvMain.currentIndex().row(), 0).data())
+        fm_edit_data = DoDataForm.DoDataForm(self, do_type=2,
+                                             pred_id=self.stm.index(self.tvMain.currentIndex().row(), 0).data())
         fm_edit_data.exec()
         self.stm.selectRow(self.tvMain.currentIndex().row())
