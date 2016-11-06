@@ -53,7 +53,7 @@ class MyLoginPage(QtWidgets.QMainWindow):
         uw = UsersForm.MyUsersWindow(self)
         uw.exec()
         self.dict_user = uw.dict_user
-        if self.dict_user['username']:
+        if 'username' in self.dict_user:
             self.UserEdit.setText(self.dict_user['username'])
             self.PassEdit.setFocus()
 
@@ -61,8 +61,7 @@ class MyLoginPage(QtWidgets.QMainWindow):
         self.close()
 
     def on_clicked_ok_login(self):
-        mf = MainForm.MyMainWindow(self)
-        mf.dict_user = self.dict_user
+        mf = MainForm.MyMainWindow(self, dict_user=self.dict_user)
         mf.exec()
 
 

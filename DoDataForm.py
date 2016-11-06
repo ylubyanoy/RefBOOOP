@@ -95,8 +95,12 @@ class DoDataForm(QtWidgets.QDialog):
     def update_preds(self, dict_data_upd):
         """Редактирование и запись данных в таблицу Preds"""
         # Проверка заполнения данных
-        if not self.dict_data_form['EditPredName'] or not self.dict_data_form['id_otrasl'] or not self.dict_data_form['id_rayon']:
-            QtWidgets.QMessageBox.warning(None, "Редактирование", "Ошибка при записи! Не все обязательные поля заполнены")
+        if not self.dict_data_form['EditPredName'] \
+                or not self.dict_data_form['id_otrasl'] \
+                or not self.dict_data_form['id_rayon']:
+
+            QtWidgets.QMessageBox.warning(None, "Редактирование",
+                                          "Ошибка при записи! Не все обязательные поля заполнены")
             return False
 
         query = QtSql.QSqlQuery()
@@ -130,7 +134,10 @@ class DoDataForm(QtWidgets.QDialog):
     def insert_preds(self, dict_data_ins):
         """Запись новых данных в таблицу Preds"""
         # Проверка заполнения данных
-        if not self.dict_data_form['EditPredName'] or not self.dict_data_form['id_otrasl'] or not self.dict_data_form['id_rayon']:
+        if not self.dict_data_form['EditPredName'] \
+                or not self.dict_data_form['id_otrasl'] \
+                or not self.dict_data_form['id_rayon']:
+
             QtWidgets.QMessageBox.warning(None, "Новая запись", "Ошибка при записи! Не все обязательные поля заполнены")
             return 0
 
@@ -156,7 +163,8 @@ class DoDataForm(QtWidgets.QDialog):
         query.bindValue(':id_user', dict_data_ins['id_user'])
 
         if not query.exec_():
-            QtWidgets.QMessageBox.warning(None, "Новая запись", "Ошибка при записи: {0}".format(query.lastError().text()))
+            QtWidgets.QMessageBox.warning(None, "Новая запись",
+                                          "Ошибка при записи: {0}".format(query.lastError().text()))
             return 0
         else:
             return query.lastInsertId()

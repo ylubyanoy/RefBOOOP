@@ -49,8 +49,11 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="0" colspan="3">
+   <item row="3" column="0" colspan="3">
     <widget class="QTableView" name="tvMain">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -81,6 +84,55 @@
     <widget class="QPushButton" name="btnReports">
      <property name="text">
       <string>Отчеты</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="laOtrasl">
+     <property name="text">
+      <string>Отрасль</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="laRayon">
+     <property name="text">
+      <string>Район</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="cmbOtrasli">
+     <property name="maximumSize">
+      <size>
+       <width>325</width>
+       <height>27</height>
+      </size>
+     </property>
+     <property name="maxCount">
+      <number>300</number>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+     </property>
+     <property name="minimumContentsLength">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="cmbRayons">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>325</width>
+       <height>27</height>
+      </size>
      </property>
     </widget>
    </item>

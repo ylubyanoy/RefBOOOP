@@ -13,26 +13,26 @@ class NewQSqlRelationalTableModel(QtSql.QSqlRelationalTableModel):
             if column15_data == 1:
                 font = QtGui.QFont('Arial', 10)
                 font.setStrikeOut(True)
-                return font
+                return QtCore.QVariant(font)
             if column16_data == 1:
                 font = QtGui.QFont('Arial', 8)
                 font.setBold(True)
-                return font
+                return QtCore.QVariant(font)
 
         if role == QtCore.Qt.TextColorRole:
             column15_data = index.sibling(index.row(), 15).data()  # deleteddata
             column16_data = index.sibling(index.row(), 16).data()  # markeddata
             if column15_data == 1:
-                return QtGui.QColor(QtCore.Qt.darkRed)
+                return QtCore.QVariant(QtGui.QColor(QtCore.Qt.darkRed))
             if column16_data == 1:
-                return QtGui.QColor(QtCore.Qt.darkGreen)
+                return QtCore.QVariant(QtGui.QColor(QtCore.Qt.darkGreen))
 
         return value
 
 
 class MyMainWindow(QtWidgets.QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, dict_user=None):
         super(QtWidgets.QDialog, self).__init__(parent)
 
         uic.loadUi("Forms/MainForm.ui", self)
@@ -41,11 +41,16 @@ class MyMainWindow(QtWidgets.QDialog):
         self.btnAddRecord.clicked.connect(self.on_add_record)
         self.btnDelRecord.clicked.connect(self.on_delete_record)
         self.btnEditRecord.clicked.connect(self.on_edit_record)
+
+        self.cmbRayons.currentIndexChanged[str].connect(self.rayons_filter_on)
+        self.cmbOtrasli.currentIndexChanged[str].connect(self.otrasli_filter_on)
+
         self.setWindowTitle("Справочник первичных профсоюзных организаций Белгородского"
                             " областного объединения организаций профсоюзов")
-        self.dict_user = {}
 
-        self.stm = NewQSqlRelationalTableModel()  # QtSql.QSqlRelationalTableModel()
+        self.dict_user = {} if dict_user is None else dict_user
+
+        self.stm = NewQSqlRelationalTableModel()
         self.stm.setTable("preds")
         self.stm.setEditStrategy(QtSql.QSqlTableModel.OnManualSubmit)
         self.stm.setRelation(11, QtSql.QSqlRelation('otrasli', 'id_otrasl', 'otname'))
@@ -66,7 +71,6 @@ class MyMainWindow(QtWidgets.QDialog):
         self.stm.select()
 
         self.tvMain.setModel(self.stm)
-
         self.tvMain.setColumnWidth(1, 300)
         self.tvMain.setColumnWidth(2, 150)
         self.tvMain.setColumnWidth(3, 150)
@@ -88,6 +92,50 @@ class MyMainWindow(QtWidgets.QDialog):
 
         self.tvMain.setAlternatingRowColors(True)
         self.tvMain.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+        # Инициализация фильтров на форме
+
+        self.proxy = QtCore.QSortFilterProxyModel(self)
+        self.proxy.setSourceModel(self.stm)
+        self.proxy.setDynamicSortFilter(True)
+        self.tvMain.setModel(self.proxy)
+
+        self.rayons_model = QtSql.QSqlTableModel()
+        self.rayons_model.setTable('rayons')
+        self.rayons_model.select()
+
+        self.cmbRayons.setModel(self.rayons_model)
+        self.cmbRayons.setModelColumn(1)
+        self.cmbRayons.setCurrentIndex(-1)
+
+        if self.dict_user and (not self.dict_user['ADMIN'] and not self.dict_user['BOOOP']):
+            self.laOtrasl.setVisible(False)
+            self.cmbOtrasli.setVisible(False)
+        else:
+            self.laOtrasl.setVisible(True)
+            self.cmbOtrasli.setVisible(True)
+
+            self.otrasli_model = QtSql.QSqlTableModel()
+            self.otrasli_model.setTable('otrasli')
+            self.otrasli_model.select()
+
+            self.cmbOtrasli.setModel(self.otrasli_model)
+            self.cmbOtrasli.setModelColumn(1)
+            self.cmbOtrasli.setCurrentIndex(-1)
+
+    def rayons_filter_on(self, text):
+        self.cmbOtrasli.blockSignals(True)
+        self.cmbOtrasli.setCurrentIndex(-1)
+        self.cmbOtrasli.blockSignals(False)
+        self.proxy.setFilterKeyColumn(12)
+        self.proxy.setFilterFixedString(text)
+
+    def otrasli_filter_on(self, text):
+        self.cmbRayons.blockSignals(True)
+        self.cmbRayons.setCurrentIndex(-1)
+        self.cmbRayons.blockSignals(False)
+        self.proxy.setFilterKeyColumn(11)
+        self.proxy.setFilterFixedString(text)
 
     def on_add_record(self):
         fm_add_data = DoDataForm.DoDataForm(self, do_type=1)
@@ -115,8 +163,9 @@ class MyMainWindow(QtWidgets.QDialog):
         self.destroy()
 
     def on_edit_record(self):
-        fm_edit_data = DoDataForm.DoDataForm(self, do_type=2,
-                                             pred_id=self.stm.index(self.tvMain.currentIndex().row(), 0).data())
-        fm_edit_data.dict_user = self.dict_user
-        fm_edit_data.exec()
-        self.stm.selectRow(self.tvMain.currentIndex().row())
+        if self.stm.index(self.tvMain.currentIndex().row(), 0).data():
+            fm_edit_data = DoDataForm.DoDataForm(self, do_type=2,
+                                                 pred_id=self.stm.index(self.tvMain.currentIndex().row(), 0).data())
+            fm_edit_data.dict_user = self.dict_user
+            fm_edit_data.exec()
+            self.stm.selectRow(self.tvMain.currentIndex().row())
