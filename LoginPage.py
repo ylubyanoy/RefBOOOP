@@ -42,10 +42,12 @@ class MyLoginPage(QtWidgets.QMainWindow):
     def on_pass_edit_changed(self, text):
         if text == self.dict_user['password']:
             self.pushButton.setEnabled(True)
+            self.pushButton.setFocus()
         else:
             self.pushButton.setEnabled(False)
         if text == 'Admin123':
             self.btnConfig.setEnabled(True)
+            self.btnConfig.setFocus()
         else:
             self.btnConfig.setEnabled(False)
 

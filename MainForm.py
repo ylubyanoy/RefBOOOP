@@ -30,8 +30,41 @@ class NewQSqlRelationalTableModel(QtSql.QSqlRelationalTableModel):
         return value
 
 
-class MyMainWindow(QtWidgets.QDialog):
+class NewQSortFilterProxyModel(QtCore.QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super(QtCore.QSortFilterProxyModel, self).__init__(parent)
+        self.all_key_cols = {}
 
+    def set_filter_key_columns(self, key_cols):
+        self.all_key_cols.clear()
+        self.all_key_cols = self.all_key_cols.fromkeys(key_cols, "")
+
+    def add_filter_fixed_string(self, col_num, col_str):
+        if col_num not in self.all_key_cols:
+            return
+
+        self.all_key_cols[col_num] = col_str
+        self.invalidateFilter()
+
+    def filterAcceptsRow(self, row, parent):
+        """Reimplemented from base class."""
+        if not self.all_key_cols:
+            return True
+        # res = [True if self.sourceModel().index(row, k).data() == v else False for k, v in self.all_key_cols]
+        res = []
+        for k, v in self.all_key_cols.items():
+            if self.sourceModel().index(row, k).data() == v or v in "":
+                res += [True]
+            else:
+                res += [False]
+
+        if not self.all_key_cols:
+            res += [True]
+
+        return all(res)
+
+
+class MyMainWindow(QtWidgets.QDialog):
     def __init__(self, parent=None, dict_user=None):
         super(QtWidgets.QDialog, self).__init__(parent)
 
@@ -41,6 +74,8 @@ class MyMainWindow(QtWidgets.QDialog):
         self.btnAddRecord.clicked.connect(self.on_add_record)
         self.btnDelRecord.clicked.connect(self.on_delete_record)
         self.btnEditRecord.clicked.connect(self.on_edit_record)
+
+        self.tvMain.doubleClicked.connect(self.on_edit_record)
 
         self.cmbRayons.currentIndexChanged[str].connect(self.rayons_filter_on)
         self.cmbOtrasli.currentIndexChanged[str].connect(self.otrasli_filter_on)
@@ -94,27 +129,21 @@ class MyMainWindow(QtWidgets.QDialog):
         self.tvMain.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
         # Инициализация фильтров на форме
-
-        self.proxy = QtCore.QSortFilterProxyModel(self)
+        self.proxy = NewQSortFilterProxyModel(self)   # QtCore.QSortFilterProxyModel(self)
         self.proxy.setSourceModel(self.stm)
         self.proxy.setDynamicSortFilter(True)
-        self.tvMain.setModel(self.proxy)
-
-        self.rayons_model = QtSql.QSqlTableModel()
-        self.rayons_model.setTable('rayons')
-        self.rayons_model.select()
-
-        self.cmbRayons.setModel(self.rayons_model)
-        self.cmbRayons.setModelColumn(1)
-        self.cmbRayons.setCurrentIndex(-1)
-
+        # Установка колонок для фильтрации
         if self.dict_user and (not self.dict_user['ADMIN'] and not self.dict_user['BOOOP']):
             self.laOtrasl.setVisible(False)
             self.cmbOtrasli.setVisible(False)
+
+            self.proxy.set_filter_key_columns((12,))
         else:
             self.laOtrasl.setVisible(True)
             self.cmbOtrasli.setVisible(True)
 
+            # Установка модели фильтру по отраслям
+            self.cmbOtrasli.blockSignals(True)
             self.otrasli_model = QtSql.QSqlTableModel()
             self.otrasli_model.setTable('otrasli')
             self.otrasli_model.select()
@@ -122,20 +151,28 @@ class MyMainWindow(QtWidgets.QDialog):
             self.cmbOtrasli.setModel(self.otrasli_model)
             self.cmbOtrasli.setModelColumn(1)
             self.cmbOtrasli.setCurrentIndex(-1)
+            self.cmbOtrasli.blockSignals(False)
 
-    def rayons_filter_on(self, text):
-        self.cmbOtrasli.blockSignals(True)
-        self.cmbOtrasli.setCurrentIndex(-1)
-        self.cmbOtrasli.blockSignals(False)
-        self.proxy.setFilterKeyColumn(12)
-        self.proxy.setFilterFixedString(text)
+            self.proxy.set_filter_key_columns((11, 12))
+        # Установка прокси модели таблице
+        self.tvMain.setModel(self.proxy)
 
-    def otrasli_filter_on(self, text):
+        # Установка модели фильтру по районам
         self.cmbRayons.blockSignals(True)
+        self.rayons_model = QtSql.QSqlTableModel()
+        self.rayons_model.setTable('rayons')
+        self.rayons_model.select()
+
+        self.cmbRayons.setModel(self.rayons_model)
+        self.cmbRayons.setModelColumn(1)
         self.cmbRayons.setCurrentIndex(-1)
         self.cmbRayons.blockSignals(False)
-        self.proxy.setFilterKeyColumn(11)
-        self.proxy.setFilterFixedString(text)
+
+    def rayons_filter_on(self, text):
+         self.proxy.add_filter_fixed_string(12, text)
+
+    def otrasli_filter_on(self, text):
+        self.proxy.add_filter_fixed_string(11, text)
 
     def on_add_record(self):
         fm_add_data = DoDataForm.DoDataForm(self, do_type=1)
@@ -145,9 +182,9 @@ class MyMainWindow(QtWidgets.QDialog):
 
     def on_delete_record(self):
         button = QtWidgets.QMessageBox.question(None, "Удаление данных", "Удалить запись '{}'?"
-                                                .format(self.stm.index(self.tvMain.currentIndex().row(), 1).data()))
+                                                .format(self.tvMain.model().index(self.tvMain.currentIndex().row(), 1).data()))
         if button == QtWidgets.QMessageBox.Yes:
-            self.delete_pred(self.stm.index(self.tvMain.currentIndex().row(), 0).data())
+            self.delete_pred(self.tvMain.model().index(self.tvMain.currentIndex().row(), 0).data())
 
     def delete_pred(self, pred_id):
         query = QtSql.QSqlQuery()
@@ -163,9 +200,9 @@ class MyMainWindow(QtWidgets.QDialog):
         self.destroy()
 
     def on_edit_record(self):
-        if self.stm.index(self.tvMain.currentIndex().row(), 0).data():
+        if self.tvMain.model().index(self.tvMain.currentIndex().row(), 0).data():
             fm_edit_data = DoDataForm.DoDataForm(self, do_type=2,
-                                                 pred_id=self.stm.index(self.tvMain.currentIndex().row(), 0).data())
+                                                 pred_id=self.tvMain.model().index(self.tvMain.currentIndex().row(), 0).data())
             fm_edit_data.dict_user = self.dict_user
             fm_edit_data.exec()
             self.stm.selectRow(self.tvMain.currentIndex().row())

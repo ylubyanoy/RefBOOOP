@@ -45,6 +45,9 @@ class MyUsersWindow(QtWidgets.QDialog):
         self.btnAddRecord.clicked.connect(self.on_add_user)
         self.btnDelRecord.clicked.connect(self.on_delete_user)
         self.btnEditRecord.clicked.connect(self.on_edit_user)
+
+        self.tvUsers.doubleClicked.connect(self.on_clicked_select_user)
+
         self.setWindowTitle("Выберите пользователя")
         self.dict_user = {}
 
