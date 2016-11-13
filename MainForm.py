@@ -4,7 +4,7 @@ import DoDataForm
 
 class NewQSqlRelationalTableModel(QtSql.QSqlRelationalTableModel):
 
-    def data(self, index, role):
+    def data(self, index, role=None):
         value = QtSql.QSqlRelationalTableModel.data(self, index, role)
 
         if role == QtCore.Qt.FontRole:
@@ -32,7 +32,7 @@ class NewQSqlRelationalTableModel(QtSql.QSqlRelationalTableModel):
 
 class NewQSortFilterProxyModel(QtCore.QSortFilterProxyModel):
     def __init__(self, parent=None):
-        super(QtCore.QSortFilterProxyModel, self).__init__(parent)
+        super(NewQSortFilterProxyModel, self).__init__(parent)
         self.all_key_cols = {}
 
     def set_filter_key_columns(self, key_cols):
@@ -53,9 +53,12 @@ class NewQSortFilterProxyModel(QtCore.QSortFilterProxyModel):
         # res = [True if self.sourceModel().index(row, k).data() == v else False for k, v in self.all_key_cols]
         res = []
         for k, v in self.all_key_cols.items():
-            if self.sourceModel().index(row, k).data() == v or v in "":
-                res += [True]
-            else:
+            try:
+                if self.sourceModel().index(row, k).data() == v or v in "":
+                    res += [True]
+                else:
+                    res += [False]
+            except TypeError:
                 res += [False]
 
         if not self.all_key_cols:
@@ -66,7 +69,7 @@ class NewQSortFilterProxyModel(QtCore.QSortFilterProxyModel):
 
 class MyMainWindow(QtWidgets.QDialog):
     def __init__(self, parent=None, dict_user=None):
-        super(QtWidgets.QDialog, self).__init__(parent)
+        super(MyMainWindow, self).__init__(parent)
 
         uic.loadUi("Forms/MainForm.ui", self)
 
@@ -136,8 +139,6 @@ class MyMainWindow(QtWidgets.QDialog):
         if self.dict_user and (not self.dict_user['ADMIN'] and not self.dict_user['BOOOP']):
             self.laOtrasl.setVisible(False)
             self.cmbOtrasli.setVisible(False)
-
-            self.proxy.set_filter_key_columns((12,))
         else:
             self.laOtrasl.setVisible(True)
             self.cmbOtrasli.setVisible(True)
@@ -153,7 +154,14 @@ class MyMainWindow(QtWidgets.QDialog):
             self.cmbOtrasli.setCurrentIndex(-1)
             self.cmbOtrasli.blockSignals(False)
 
-            self.proxy.set_filter_key_columns((11, 12))
+        filter_key_columns = (11, 12, 15)
+        self.proxy.set_filter_key_columns(filter_key_columns)
+
+        if self.dict_user and not self.dict_user['ADMIN']:
+            self.proxy.add_filter_fixed_string(15, 0)
+        if self.dict_user and (not self.dict_user['ADMIN'] and not self.dict_user['BOOOP']):
+            self.proxy.add_filter_fixed_string(11, self.dict_user['otname'])
+
         # Установка прокси модели таблице
         self.tvMain.setModel(self.proxy)
 
@@ -169,7 +177,7 @@ class MyMainWindow(QtWidgets.QDialog):
         self.cmbRayons.blockSignals(False)
 
     def rayons_filter_on(self, text):
-         self.proxy.add_filter_fixed_string(12, text)
+        self.proxy.add_filter_fixed_string(12, text)
 
     def otrasli_filter_on(self, text):
         self.proxy.add_filter_fixed_string(11, text)
@@ -188,7 +196,7 @@ class MyMainWindow(QtWidgets.QDialog):
 
     def delete_pred(self, pred_id):
         query = QtSql.QSqlQuery()
-        query.prepare("DELETE FROM preds WHERE id_pred=:pred_id")
+        query.prepare("UPDATE preds SET deleteddata=1 WHERE id_pred=:pred_id")
         query.bindValue(':pred_id', pred_id)
         if not query.exec_():
             QtWidgets.QMessageBox.warning(None, "Ошибка", query.lastError().text())

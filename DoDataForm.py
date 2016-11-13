@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtWidgets, uic, QtSql
+from PyQt5 import QtWidgets, uic, QtSql
 
 EMPTY_TEXT = "<Пустое значение>"
 EMPTY_DATA = 0
@@ -6,7 +6,7 @@ EMPTY_DATA = 0
 
 class DoDataForm(QtWidgets.QDialog):
     def __init__(self, parent=None, do_type=1, pred_id=0):
-        super(QtWidgets.QDialog, self).__init__(parent)
+        super(DoDataForm, self).__init__(parent)
         uic.loadUi("Forms/DoDataForm.ui", self)
         # Настройка окна Добавления/редактирования данных
         self.setWindowTitle("Добавить информацию") if do_type == 1 else self.setWindowTitle("Редактировать информацию")

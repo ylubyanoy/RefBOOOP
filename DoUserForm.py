@@ -7,7 +7,7 @@ EMPTY_DATA = 0
 
 class UserForm(QtWidgets.QDialog):
     def __init__(self, parent=None, do_type=1, id_user=0):
-        super(QtWidgets.QDialog, self).__init__(parent)
+        super(UserForm, self).__init__(parent)
         uic.loadUi("Forms/DoUserForm.ui", self)
         # Настройка окна Добавления/редактирования пользователя
         self.setFixedSize(613, 234)

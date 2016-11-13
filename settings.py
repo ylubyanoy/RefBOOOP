@@ -32,10 +32,6 @@ def settings_load():
 def settings_save(settings_values):
     settings_file = shelve.open(SETTINGS_NAME)
     if settings_file:
-        # settings_values = [dict_values['leUserName'], dict_values['lePassword'], dict_values['leDBName'],
-        #                    dict_values['leDBHost'], dict_values['leDBPort']]
-        # settings_values = [settings_values[0], settings_values[1], settings_values[2],
-        #                    settings_values[3], settings_values[4]]
         settings_file['settings'] = settings_values
         settings_file.close()
 

@@ -3,9 +3,8 @@ import DoUserForm
 
 
 class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
-
     def __init__(self, parent=None):
-        super(QtWidgets.QStyledItemDelegate, self).__init__(parent)
+        super(CheckBoxDelegate, self).__init__(parent)
 
     def paint(self, painter, option, index):
 
@@ -38,7 +37,7 @@ class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
 
 class MyUsersWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        super(QtWidgets.QDialog, self).__init__(parent)
+        super(MyUsersWindow, self).__init__(parent)
         uic.loadUi("Forms/UsersForm.ui", self)
         self.btnCancel.clicked.connect(self.on_clicked_cancel_user)
         self.btnSelectUser.clicked.connect(self.on_clicked_select_user)

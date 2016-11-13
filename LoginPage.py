@@ -6,7 +6,7 @@ import SettingsForm
 
 class MyLoginPage(QtWidgets.QMainWindow):
     def __init__(self, parent=None, db_is_open=False):
-        super(QtWidgets.QMainWindow, self).__init__(parent)
+        super(MyLoginPage, self).__init__(parent)
         uic.loadUi("Forms/LoginMainForm.ui", self)
         # Настройка окна авторизации
         self.setWindowTitle("Авторизация")

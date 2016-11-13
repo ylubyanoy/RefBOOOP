@@ -4,7 +4,7 @@ import settings
 
 class MySettingsWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        super(QtWidgets.QDialog, self).__init__(parent)
+        super(MySettingsWindow, self).__init__(parent)
         uic.loadUi("Forms/SettingsForm.ui", self)
         self.btnCancel.clicked.connect(self.on_cancel_settings)
         self.btnSave.clicked.connect(self.on_save_settings)
